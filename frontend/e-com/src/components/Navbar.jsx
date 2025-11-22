@@ -13,7 +13,7 @@ function Navbar() {
         <div>
           <Link to="/" className="Hover:text-gray-300">Home</Link>
           <Link to="/products" className="Hover:text-gray-300">Products</Link>
-          <Link to ="/addprouct" className="Hover:text-300">AddProduct</Link>
+          <Link to ="/addproduct" className="Hover:text-300">AddProduct</Link>
         </div>
         <input type="text" placeholder='Serach Here' className='px-3 py-1 rounded bg-gray-700 text-white'/>
 
