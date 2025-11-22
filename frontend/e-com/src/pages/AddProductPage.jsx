@@ -1,44 +1,36 @@
 import { useContext, useState } from "react";
 import { ProductsContext } from "../context/ProductsContext";
+import { useNavigate } from "react-router-dom";
 
-export default function AddProduct() {
+export default function AddProductPage() {
   const { addProduct } = useContext(ProductsContext);
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     name: "",
     price: "",
     description: "",
     image: "",
+    category: "all",
   });
 
-  // Handle input changes
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  // Handle form submit
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    // Ensure image is not empty
-    const productData = {
+    await addProduct({
       name: form.name,
       price: Number(form.price),
       description: form.description,
-      image: form.image || "https://via.placeholder.com/150", // default image
-    };
-
-    addProduct(productData);
+      image: form.image || "default-image.jpg",
+      category: form.category,
+    });
 
     alert("Product added!");
-    
-    // Reset form after submission
-    setForm({
-      name: "",
-      price: "",
-      description: "",
-      image: "",
-    });
+    navigate("/products");
   }
 
   return (
@@ -47,45 +39,39 @@ export default function AddProduct() {
 
       <input
         name="name"
-        value={form.name}
         placeholder="Product Name"
         className="w-full p-2 border mb-3"
         onChange={handleChange}
         required
       />
-
       <input
         name="price"
         type="number"
-        value={form.price}
         placeholder="Price"
         className="w-full p-2 border mb-3"
         onChange={handleChange}
         required
       />
-
       <textarea
         name="description"
-        value={form.description}
         placeholder="Description"
         className="w-full p-2 border mb-3"
         onChange={handleChange}
-        required
       />
-
       <input
-        type="text"
         name="image"
-        value={form.image}
         placeholder="Image URL"
         className="w-full p-2 border mb-3"
         onChange={handleChange}
       />
+      <input
+        name="category"
+        placeholder="Category"
+        className="w-full p-2 border mb-3"
+        onChange={handleChange}
+      />
 
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded"
-      >
+      <button className="bg-blue-600 text-white px-4 py-2 rounded">
         Add Product
       </button>
     </form>

@@ -1,25 +1,45 @@
-import React from 'react'
-import {Link} from 'react-router-dom';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { ProductsContext } from "../context/ProductsContext";
 
-function Navbar() {
-    const navigate = useNavigate();
+export default function Navbar() {
+  const navigate = useNavigate();
+  const { search, setSearch } = useContext(ProductsContext);
 
   return (
-    <div>
-      <nav className="bg-gray-900 text-white px-6 py-3 flex justify-beteen">
-        <h1  className="bg-info text-xl font-bold cursor-pointer"
-        onClick={() => navigate("/products")}>First Step </h1>
-        <div>
-          <Link to="/" className="Hover:text-gray-300">Home</Link>
-          <Link to="/products" className="Hover:text-gray-300">Products</Link>
-          <Link to ="/addproduct" className="Hover:text-300">AddProduct</Link>
-        </div>
-        <input type="text" placeholder='Serach Here' className='px-3 py-1 rounded bg-gray-700 text-white'/>
+    <nav className="bg-gray-900 text-white px-6 py-3 flex flex-col sm:flex-row justify-between items-center">
+      {/* Logo */}
+      <h1
+        className="text-2xl font-bold cursor-pointer mb-2 sm:mb-0"
+        onClick={() => navigate("/products")}
+      >
+        MiniShop
+      </h1>
 
-      </nav>
-    </div>
-  )
+      {/* Navigation Links */}
+      <div className="flex gap-4 items-center mb-2 sm:mb-0">
+        <Link
+          to="/products"
+          className="hover:text-gray-300 transition"
+        >
+          Products
+        </Link>
+        <Link
+          to="/add-product"
+          className="hover:text-gray-300 transition"
+        >
+          Add Product
+        </Link>
+      </div>
+
+      {/* Search */}
+      <input
+        type="text"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        placeholder="Search products..."
+        className="p-2 rounded border border-gray-300 text-black w-full sm:w-64"
+      />
+    </nav>
+  );
 }
-
-export default Navbar

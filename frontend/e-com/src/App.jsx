@@ -1,21 +1,21 @@
-import React from "react";
-import {Routes,BrowserRouter,Route} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { ProductsProvider } from "./context/ProductsContext";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
 import ProductsPage from "./pages/ProductsPage";
 import AddProductPage from "./pages/AddProductPage";
+
 function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
-      <div className="p-5">
+    <ProductsProvider>
+      <Router>
+        <Navbar />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Navigate to="/products" />} />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/addProduct" element={<AddProductPage />} />
+          <Route path="/add-product" element={<AddProductPage />} />
         </Routes>
-      </div>
-    </BrowserRouter>
+      </Router>
+    </ProductsProvider>
   );
 }
 
