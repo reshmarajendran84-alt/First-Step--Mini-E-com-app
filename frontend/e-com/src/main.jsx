@@ -1,13 +1,19 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom/client";
+
 import App from "./App";
-import { ProductsProvider } from "./context/ProductsContext";
+import { ProductsProvider } from "./Context/ProductsContext";
+import { AuthProvider } from "./Context/AuthContext";
+import { Toaster } from "react-hot-toast";
 import "./index.css";
 
-createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <ProductsProvider>
-      <App />
-    </ProductsProvider>
+    <AuthProvider>
+      <ProductsProvider>
+        <App />
+        <Toaster position="top-center" />
+      </ProductsProvider>
+    </AuthProvider>
   </React.StrictMode>
 );

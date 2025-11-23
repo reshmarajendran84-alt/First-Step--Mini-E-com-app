@@ -1,79 +1,131 @@
-import { useContext, useState } from "react";
-import { ProductsContext } from "../context/ProductsContext";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { ProductsContext } from "../Context/ProductsContext";
+import { toast } from "react-hot-toast";
 
-export default function AddProductPage() {
+const AddProduct = () => {
   const { addProduct } = useContext(ProductsContext);
-  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     name: "",
     price: "",
     description: "",
-    image: "",
-    category: "all",
+    category: "",
+    sizes: "",
   });
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState("");
 
-  async function handleSubmit(e) {
+  // Handle input change
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Handle image selection
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  // Submit form
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await addProduct({
-      name: form.name,
-      price: Number(form.price),
-      description: form.description,
-      image: form.image || "default-image.jpg",
-      category: form.category,
-    });
+    if (!image) {
+      toast.error("Please upload an image");
+      return;
+    }
 
-    alert("Product added!");
-    navigate("/products");
-  }
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("price", form.price);
+    formData.append("description", form.description);
+    formData.append("category", form.category);
+    formData.append("sizes", JSON.stringify(form.sizes.split(","))); // convert to array
+    formData.append("image", image);
+
+    try {
+      await addProduct(formData);
+      toast.success("Product added successfully!");
+
+      // Reset form
+      setForm({
+        name: "",
+        price: "",
+        description: "",
+        category: "",
+        sizes: "",
+      });
+      setImage(null);
+      setPreview("");
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  };
 
   return (
-    <form className="max-w-md mx-auto p-4" onSubmit={handleSubmit}>
-      <h1 className="text-2xl font-bold mb-4">Add Product</h1>
+    <div className="add-product-page">
+      <h2>Add Product</h2>
 
-      <input
-        name="name"
-        placeholder="Product Name"
-        className="w-full p-2 border mb-3"
-        onChange={handleChange}
-        required
-      />
-      <input
-        name="price"
-        type="number"
-        placeholder="Price"
-        className="w-full p-2 border mb-3"
-        onChange={handleChange}
-        required
-      />
-      <textarea
-        name="description"
-        placeholder="Description"
-        className="w-full p-2 border mb-3"
-        onChange={handleChange}
-      />
-      <input
-        name="image"
-        placeholder="Image URL"
-        className="w-full p-2 border mb-3"
-        onChange={handleChange}
-      />
-      <input
-        name="category"
-        placeholder="Category"
-        className="w-full p-2 border mb-3"
-        onChange={handleChange}
-      />
+      <form onSubmit={handleSubmit} className="form-container">
+        
+        <input
+          type="text"
+          name="name"
+          placeholder="Product Name"
+          value={form.name}
+          onChange={handleChange}
+          required
+        />
 
-      <button className="bg-blue-600 text-white px-4 py-2 rounded">
-        Add Product
-      </button>
-    </form>
+        <input
+          type="number"
+          name="price"
+          placeholder="Price"
+          value={form.price}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          type="text"
+          name="category"
+          placeholder="Category"
+          value={form.category}
+          onChange={handleChange}
+          required
+        />
+
+        <textarea
+          name="description"
+          placeholder="Description"
+          value={form.description}
+          onChange={handleChange}
+        ></textarea>
+
+        <input
+          type="text"
+          name="sizes"
+          placeholder="Sizes (comma separated) ex: S,M,L"
+          value={form.sizes}
+          onChange={handleChange}
+        />
+
+        <input type="file" onChange={handleImage} />
+
+        {preview && (
+          <img
+            src={preview}
+            alt="preview"
+            style={{ width: "120px", marginTop: "10px", borderRadius: "8px" }}
+          />
+        )}
+
+        <button type="submit">Add Product</button>
+      </form>
+    </div>
   );
-}
+};
+
+export default AddProduct;

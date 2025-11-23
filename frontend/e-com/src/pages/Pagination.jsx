@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ProductsContext } from "../context/ProductsContext";
+import { ProductsContext } from "../Context/ProductsContext";
 
 export default function Pagination() {
   const { page, setPage, limit, products } = useContext(ProductsContext);

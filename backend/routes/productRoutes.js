@@ -1,46 +1,48 @@
 const express = require("express");
+const upload = require("../middleware/multer");
+const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
+const Product = require("../models/Products");
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+
+const {
+  getProducts,
+  getProductById,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+} = require("../controller/productController");
+
 const router = express.Router();
-const Product =require("../models/Products");
-const { getProducts, addProduct } = require("../controller/productController"); // make sure folder is 'controller', not 'controllers'
-const { Products } = require("../models/Products");
 
-// GET all products
-// router.get("/", getProducts);
-router.get("/",async(req,res)=>{
-    try{
-        const{search,category,sort,page=1,limit=6}=req.query;
-        const query={};
-        if(search){
-            query.name={$regex:search,$options:"i"};
-        }
-        if(category){
-            query.category=category;
-        }
-        let sortOption ={};
-        if(sort === "price_asc") sortOption =1;
-        else if(sort === "price_dec") sortOption=-1;
-        const Product =await Product.find(query)
-        .sort(sortOption)
-        .skip((page -1)* limit)
-        .limit(Number(limit));
-        res.json(Products);
+// PUBLIC ROUTES
+router.get("/", getProducts);
+router.get("/:id", getProductById);
 
-    }catch(err){
-        res.status(500).json({message:err.message});
+// ADMIN ROUTES
+router.post("/", auth, admin, upload.single("image"), addProduct);
+router.put("/:id", auth, admin, updateProduct);
+router.delete("/:id", auth, admin, deleteProduct);
 
-    }
-});
+// LOGIN (Admin/User)
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
-// POST add product
-router.post("/",async(req,res)=>{
-    try{
-        const newProduct =new Product(req.body);
-        await newProduct.save();
-        res.status(201).json(newProduct);
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ message: "User not found" });
 
-    }catch(err){
-        res.status(500).json({message:err.message});
-    }
+  if (user.password !== password) {
+    return res.status(400).json({ message: "Incorrect password" });
+  }
+
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  res.json({ token, role: user.role });
 });
 
 module.exports = router;
